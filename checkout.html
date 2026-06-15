@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkout — Flower By Ellyse</title>
+<meta name="description" content="Complete your order securely with GCash, bank transfer, COD, or PayPal.">
+<link rel="icon" href="assets/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="page-head"><div class="container"><h1>Checkout</h1>
+  <p class="crumbs"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / Checkout</p></div></section>
+
+<section class="section">
+  <div class="container">
+    <form class="checkout-grid" id="checkoutForm" novalidate>
+      <div>
+        <div class="form-card">
+          <h3>Customer Information</h3>
+          <div class="field"><label for="name">Full Name *</label><input id="name" name="name" required></div>
+          <div class="grid-2">
+            <div class="field"><label for="email">Email *</label><input id="email" type="email" name="email" required></div>
+            <div class="field"><label for="phone">Phone *</label><input id="phone" type="tel" name="phone" required></div>
+          </div>
+        </div>
+        <div class="form-card">
+          <h3>Delivery Information</h3>
+          <div class="field"><label for="address">Complete Address *</label><input id="address" name="address" required></div>
+          <div class="grid-2">
+            <div class="field"><label for="city">City *</label><input id="city" name="city" value="Cebu City" required></div>
+            <div class="field"><label for="postal">Postal Code</label><input id="postal" name="postal" value="6000"></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="date">Delivery Date *</label><input id="date" type="date" required></div>
+            <div class="field"><label for="time">Preferred Time</label>
+              <select id="time">
+                <option>Morning (9 AM – 12 PM)</option>
+                <option>Afternoon (12 PM – 4 PM)</option>
+                <option>Evening (4 PM – 8 PM)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <h3>Additional Information</h3>
+          <div class="field"><label for="message">Personalized Gift Message</label><textarea id="message" placeholder="e.g. Happy Birthday Mom, love always!"></textarea></div>
+          <div class="field"><label for="notes">Delivery Notes</label><textarea id="notes" placeholder="Landmarks, gate codes, recipient phone…"></textarea></div>
+        </div>
+        <div class="form-card">
+          <h3>Payment Method</h3>
+          <div class="pay-options">
+            <label><input type="radio" name="pay" value="COD" checked> 💵 Cash on Delivery</label>
+            <label><input type="radio" name="pay" value="GCash"> 📱 GCash</label>
+            <label><input type="radio" name="pay" value="Bank Transfer"> 🏦 Bank Transfer</label>
+            <label><input type="radio" name="pay" value="PayPal"> 🅿️ PayPal</label>
+          </div>
+        </div>
+      </div>
+
+      <aside class="summary">
+        <h3>Order Summary</h3>
+        <div id="orderItems"></div>
+        <div class="summary-row"><span>Subtotal</span><span id="sub">—</span></div>
+        <div class="summary-row" id="discRow" style="display:none;color:#1b8c4a"><span id="discLbl">Discount</span><span id="disc">—</span></div>
+        <div class="summary-row"><span>Delivery</span><span id="fee">—</span></div>
+        <div class="summary-row total"><span>Grand Total</span><span id="total">—</span></div>
+        <button class="btn btn-primary btn-block" type="submit" style="margin-top:14px">Place Order</button>
+        <p class="muted" style="font-size:.8rem;margin-top:10px;text-align:center">Order details are sent to ${''}<a href="https://wa.me/639566504470">WhatsApp</a> for instant confirmation.</p>
+      </aside>
+    </form>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+mountChrome("");
+
+const items = Cart.get();
+if(!items.length){ location.href = "cart.html"; }
+
+const COUPONS = { "ELLYSE10": 0.10, "BLOOM15": 0.15 };
+const coupon = localStorage.getItem("fbe_coupon");
+const sub = Cart.subtotal();
+const discount = coupon && COUPONS[coupon] ? sub * COUPONS[coupon] : 0;
+const fee = sub - discount >= 3000 ? 0 : SHOP.deliveryFee;
+const total = sub - discount + fee;
+
+document.getElementById("orderItems").innerHTML = items.map(i=>{
+  const p = PRODUCTS.find(x=>x.id===i.id);
+  return `<div class="summary-row"><span>${p.name} × ${i.qty}</span><span>${fmt(p.price*i.qty)}</span></div>`;
+}).join("") + `<hr style="border:0;border-top:1px dashed var(--border);margin:6px 0">`;
+document.getElementById("sub").textContent = fmt(sub);
+if(discount){ document.getElementById("discRow").style.display="flex";
+  document.getElementById("discLbl").textContent = `Coupon (${coupon})`;
+  document.getElementById("disc").textContent = "−"+fmt(discount); }
+document.getElementById("fee").textContent = fee? fmt(fee):"Free";
+document.getElementById("total").textContent = fmt(total);
+
+// Default delivery date = tomorrow
+const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
+document.getElementById("date").value = tomorrow.toISOString().slice(0,10);
+document.getElementById("date").min = new Date().toISOString().slice(0,10);
+
+document.getElementById("checkoutForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const form = e.target;
+  if(!form.checkValidity()){ form.reportValidity(); return; }
+  const orderNo = "FBE-" + Date.now().toString().slice(-8);
+  const pay = form.querySelector('input[name=pay]:checked').value;
+  const order = {
+    orderNo, createdAt: new Date().toISOString(),
+    customer: { name:name.value, email:email.value, phone:phone.value },
+    delivery: { address:address.value, city:city.value, postal:postal.value,
+                date:document.getElementById("date").value,
+                time:document.getElementById("time").value,
+                notes:document.getElementById("notes").value,
+                giftMessage:document.getElementById("message").value },
+    items: items.map(i=>{ const p=PRODUCTS.find(x=>x.id===i.id); return {name:p.name, qty:i.qty, price:p.price, lineTotal:p.price*i.qty};}),
+    payment: pay, subtotal:sub, discount, coupon: discount?coupon:null, deliveryFee:fee, total
+  };
+  localStorage.setItem("fbe_lastOrder", JSON.stringify(order));
+
+  // Build WhatsApp notification
+  const msg = encodeURIComponent(
+`🌸 NEW ORDER — ${orderNo}
+Customer: ${order.customer.name}
+Phone: ${order.customer.phone}
+Email: ${order.customer.email}
+Address: ${order.delivery.address}, ${order.delivery.city} ${order.delivery.postal}
+Delivery: ${order.delivery.date} (${order.delivery.time})
+Payment: ${order.payment}
+Gift message: ${order.delivery.giftMessage || '—'}
+Notes: ${order.delivery.notes || '—'}
+
+Items:
+${order.items.map(i=>`• ${i.name} × ${i.qty} = ${fmt(i.lineTotal)}`).join("\n")}
+
+Subtotal: ${fmt(order.subtotal)}
+${order.discount?`Discount: -${fmt(order.discount)}\n`:''}Delivery: ${order.deliveryFee?fmt(order.deliveryFee):'Free'}
+TOTAL: ${fmt(order.total)}`);
+
+  // Open WhatsApp for instant notification to shop
+  window.open(`https://wa.me/${SHOP.whatsapp}?text=${msg}`, "_blank");
+
+  Cart.clear();
+  localStorage.removeItem("fbe_coupon");
+  location.href = "order-success.html";
+});
+</script>
+</body>
+</html>

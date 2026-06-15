@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shop Bouquets — Flower By Ellyse</title>
+<meta name="description" content="Browse fresh, hand-tied flower bouquets by Ellyse. Filter by occasion, search, and order online for fast delivery in Cebu City.">
+<link rel="icon" href="assets/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Our Collection</span>
+    <h1>Shop Bouquets</h1>
+    <p class="crumbs"><a href="index.html">Home</a> / Shop</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Search bouquets…">
+      <select id="cat">
+        <option value="">All categories</option>
+      </select>
+      <select id="price">
+        <option value="">All prices</option>
+        <option value="0-1500">Under ₱1,500</option>
+        <option value="1500-2000">₱1,500 – ₱2,000</option>
+        <option value="2000-3000">₱2,000 – ₱3,000</option>
+        <option value="3000-99999">Above ₱3,000</option>
+      </select>
+      <select id="sort">
+        <option value="featured">Sort: Featured</option>
+        <option value="price-asc">Price: Low to high</option>
+        <option value="price-desc">Price: High to low</option>
+        <option value="name">Name: A–Z</option>
+      </select>
+    </div>
+    <div class="product-grid" id="grid"></div>
+    <div id="empty" class="empty" style="display:none">No bouquets match your search. Try clearing filters.</div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+mountChrome("shop");
+const q = document.getElementById("q");
+const cat = document.getElementById("cat");
+const price = document.getElementById("price");
+const sort = document.getElementById("sort");
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+
+CATEGORIES.forEach(c=>{
+  const o=document.createElement("option"); o.value=c.id; o.textContent=c.name; cat.appendChild(o);
+});
+
+const params = new URLSearchParams(location.search);
+if(params.get("cat")) cat.value = params.get("cat");
+if(params.get("q"))   q.value = params.get("q");
+
+function render(){
+  let list = [...PRODUCTS];
+  const term = q.value.trim().toLowerCase();
+  if(term) list = list.filter(p=> p.name.toLowerCase().includes(term) || p.short.toLowerCase().includes(term));
+  if(cat.value)  list = list.filter(p=> p.category===cat.value);
+  if(price.value){
+    const [lo,hi] = price.value.split("-").map(Number);
+    list = list.filter(p=> p.price>=lo && p.price<=hi);
+  }
+  switch(sort.value){
+    case "price-asc":  list.sort((a,b)=>a.price-b.price); break;
+    case "price-desc": list.sort((a,b)=>b.price-a.price); break;
+    case "name":       list.sort((a,b)=>a.name.localeCompare(b.name)); break;
+  }
+  grid.innerHTML = list.map(productCard).join("");
+  empty.style.display = list.length ? "none" : "block";
+}
+[q,cat,price,sort].forEach(el=>el.addEventListener("input", render));
+render();
+</script>
+</body>
+</html>

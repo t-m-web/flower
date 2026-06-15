@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flower Bouquet By: Ellyse — Fresh Bouquets Delivered in Cebu City</title>
+<meta name="description" content="Beautiful hand-tied flower bouquets delivered with love in Cebu City. Fresh flowers for birthdays, anniversaries, weddings, Valentine's, and every special occasion.">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow">Cebu City · Same-Day Delivery</span>
+      <h1>Beautiful Flower Bouquets <span>Delivered With Love</span></h1>
+      <p class="lead">Fresh, hand-tied bouquets crafted by Ellyse for every special occasion. From birthdays to bridal moments — we make flowers personal.</p>
+      <div class="hero-ctas">
+        <a href="shop.html" class="btn btn-primary">Shop Now</a>
+        <a href="contact.html" class="btn btn-outline">Contact Us</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>10k+</b><span>Happy customers</span></div>
+        <div><b>4.9★</b><span>Average rating</span></div>
+        <div><b>2 hr</b><span>Same-day delivery</span></div>
+      </div>
+    </div>
+    <div class="hero-media">
+      <img src="assets/hero.jpg" alt="Pink rose bouquet by Ellyse" width="800" height="1000">
+      <div class="hero-badge"><span class="dot"></span> Fresh today · cut this morning</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">Featured</span>
+        <h2>This Week's Favorites</h2>
+      </div>
+      <a href="shop.html" class="btn btn-ghost">View all bouquets →</a>
+    </div>
+    <div class="product-grid" id="featured"></div>
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(180deg,#fff,var(--pink-50))">
+  <div class="container">
+    <div class="center">
+      <span class="eyebrow">Shop by occasion</span>
+      <h2>Flowers for Every Moment</h2>
+    </div>
+    <div class="category-grid" id="catGrid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="center">
+      <span class="eyebrow">Why choose us</span>
+      <h2>The Ellyse Promise</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><div class="ico">🌸</div><h3>Fresh Flowers</h3><p>Cut and arranged the same morning we deliver — never stale stock.</p></div>
+      <div class="why-card"><div class="ico">🚚</div><h3>Same-Day Delivery</h3><p>Order before 2 PM and we'll have it at the door the same day.</p></div>
+      <div class="why-card"><div class="ico">💰</div><h3>Affordable Prices</h3><p>Premium bouquets without the premium markup — honest pricing.</p></div>
+      <div class="why-card"><div class="ico">🔒</div><h3>Secure Checkout</h3><p>GCash, bank transfer, COD or PayPal — pay your way, safely.</p></div>
+      <div class="why-card"><div class="ico">✨</div><h3>High Quality Service</h3><p>Personalized, attentive care from order to doorstep.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section testimonials">
+  <div class="container">
+    <div class="center"><span class="eyebrow">Loved by Cebu</span><h2>What Customers Say</h2></div>
+    <div class="t-grid">
+      <div class="t-card"><div class="stars">★★★★★</div><blockquote>"Ellyse made my proposal unforgettable. The roses were stunning and delivery was on time."</blockquote><div class="who">Marco D.<small>Cebu City</small></div></div>
+      <div class="t-card"><div class="stars">★★★★★</div><blockquote>"Same-day delivery to my mom on her birthday. She cried happy tears. Thank you!"</blockquote><div class="who">Janine R.<small>Mandaue</small></div></div>
+      <div class="t-card"><div class="stars">★★★★★</div><blockquote>"Bridal bouquet was beyond gorgeous. Ellyse listened to every detail."</blockquote><div class="who">Karen & Paolo<small>Bridal couple</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Ready to send something beautiful?</h2>
+      <p>From a heartfelt anniversary surprise to a graduation celebration — let us deliver your message in petals.</p>
+      <div class="hero-ctas" style="justify-content:center">
+        <a href="shop.html" class="btn btn-primary">Order Now</a>
+        <a href="https://wa.me/639566504470" class="btn btn-outline">Chat on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  mountChrome("home");
+  document.getElementById("featured").innerHTML =
+    PRODUCTS.slice(0,4).map(productCard).join("");
+  document.getElementById("catGrid").innerHTML =
+    CATEGORIES.map(c=>`<a class="cat-chip" href="shop.html?cat=${c.id}"><span class="ico">${c.ico}</span><b>${c.name}</b></a>`).join("");
+</script>
+</body>
+</html>

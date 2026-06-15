@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bouquet — Flower By Ellyse</title>
+<meta name="description" content="Bouquet details, flower types, delivery info and reviews.">
+<link rel="icon" href="assets/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container" id="pdRoot">Loading…</div>
+</section>
+
+<section class="section" style="background:var(--pink-50)">
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">You might also love</span><h2>Related Bouquets</h2></div></div>
+    <div class="product-grid" id="related"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+mountChrome("shop");
+const id = new URLSearchParams(location.search).get("id") || PRODUCTS[0].id;
+const p = PRODUCTS.find(x=>x.id===id) || PRODUCTS[0];
+document.title = `${p.name} — Flower By Ellyse`;
+
+const root = document.getElementById("pdRoot");
+root.innerHTML = `
+  <p class="crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / ${p.name}</p>
+  <div class="pd-grid">
+    <div class="pd-gallery">
+      <div class="pd-main-img"><img id="mainImg" src="${p.img}" alt="${p.name}"></div>
+      <div class="pd-thumbs">
+        ${[p.img, p.img, p.img, p.img].map((src,i)=>`<button class="${i===0?'active':''}" data-src="${src}"><img src="${src}" alt=""></button>`).join("")}
+      </div>
+    </div>
+    <div class="pd-info">
+      <span class="eyebrow">${CATEGORIES.find(c=>c.id===p.category)?.name || ""}</span>
+      <h1>${p.name}</h1>
+      <div class="pd-price">
+        <span class="price">${fmt(p.price)}${p.old?`<small>${fmt(p.old)}</small>`:""}</span>
+        <span class="stock-pill"><span class="dot"></span>${p.stock>0 ? `In stock (${p.stock} left)` : "Sold out"}</span>
+      </div>
+      <p>${p.desc}</p>
+      <ul class="pd-meta">
+        <li><b>Flowers included</b><span>${p.flowers.join(", ")}</span></li>
+        <li><b>Delivery</b><span>Same-day in Cebu City (order before 2 PM). Next-day for surrounding areas.</span></li>
+        <li><b>Care</b><span>Trim stems and place in fresh cool water. Keep away from direct sunlight.</span></li>
+      </ul>
+      <div class="pd-actions">
+        <div class="qty">
+          <button id="minus" aria-label="Decrease">−</button>
+          <input id="qty" type="number" value="1" min="1" max="${p.stock||99}">
+          <button id="plus" aria-label="Increase">+</button>
+        </div>
+        <button class="btn btn-outline" id="addBtn">Add to Cart</button>
+        <button class="btn btn-primary" id="buyBtn">Buy Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-buttons">
+      <button class="active" data-tab="desc">Description</button>
+      <button data-tab="reviews">Customer Reviews</button>
+      <button data-tab="delivery">Delivery Info</button>
+    </div>
+    <div class="tab-panel active" id="tab-desc"><p>${p.desc}</p><p><b>Flowers:</b> ${p.flowers.join(", ")}.</p></div>
+    <div class="tab-panel" id="tab-reviews">
+      <div class="review"><div class="who">Liza M.</div><div class="stars">★★★★★</div><p>"Stunning bouquet, exactly as pictured. Recipient was thrilled!"</p></div>
+      <div class="review"><div class="who">Carlos P.</div><div class="stars">★★★★★</div><p>"Fast delivery in Cebu. Will order again for our anniversary."</p></div>
+      <div class="review"><div class="who">Mae T.</div><div class="stars">★★★★☆</div><p>"Beautiful flowers, fragrance was lovely. Wrapping was elegant."</p></div>
+    </div>
+    <div class="tab-panel" id="tab-delivery">
+      <p>Same-day delivery is available within Cebu City for orders placed before 2:00 PM. Outside metro areas typically receive next-day service.</p>
+      <p>Delivery fee: ${fmt(SHOP.deliveryFee)} flat within Cebu City. Free delivery for orders above ₱3,000.</p>
+    </div>
+  </div>
+`;
+
+document.querySelectorAll(".pd-thumbs button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".pd-thumbs button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.getElementById("mainImg").src = b.dataset.src;
+  });
+});
+const qty = document.getElementById("qty");
+document.getElementById("minus").onclick = ()=> qty.value = Math.max(1, +qty.value-1);
+document.getElementById("plus").onclick  = ()=> qty.value = Math.min(p.stock||99, +qty.value+1);
+document.getElementById("addBtn").onclick = ()=> Cart.add(p.id, +qty.value);
+document.getElementById("buyBtn").onclick = ()=>{ Cart.add(p.id, +qty.value); location.href="checkout.html"; };
+
+document.querySelectorAll(".tab-buttons button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".tab-buttons button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.getElementById("tab-"+b.dataset.tab).classList.add("active");
+  });
+});
+
+document.getElementById("related").innerHTML =
+  PRODUCTS.filter(x=>x.id!==p.id).slice(0,4).map(productCard).join("");
+</script>
+</body>
+</html>
